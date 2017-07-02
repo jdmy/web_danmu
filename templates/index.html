@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block page_content %}
+<div class="row" style="text-align:center">
+    <h4 class="modal-title" id="myModalLabel" align="center">吐槽不灵？多试试呗！</h4>
+    <br>
+    <img src="{{url_for('static',filename='img.png')}}" align="center" style="text-align:center">
+    <div class="col-md-8 col-md-offset-2"> {{ wtf.quick_form(form, form_type="horizontal") }} </div>
+</div>
+
+{% endblock %}
