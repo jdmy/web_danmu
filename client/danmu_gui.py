@@ -1,21 +1,9 @@
-# python3.6
 import tkinter as tk
-import queue
-from random import choice,randint
+from random import choice, randint
+
+from client.danmu import Danmu
 
 
-class Danmu():
-    def __init__(self, text, id, x, y):
-        self.text = text
-        self.id = id
-        self.x = x
-        self.y = y
-
-    def move(self):
-        self.x -= 5
-
-
-# import tkFileDialog
 class App(tk.Tk):
     def __init__(self, q):
         tk.Tk.__init__(self)
@@ -24,33 +12,29 @@ class App(tk.Tk):
 
 class FloatingWindow(tk.Toplevel):
     def danmu_handler(self, ):
-        n=0
+        n = 0
         for danmu in self.danmu_list:
             self.canvas.coords(danmu.id, danmu.x, danmu.y)
             danmu.move()
-            if danmu.x<0:
-                n+=1
+            if danmu.x < 0:
+                n += 1
         for i in range(n):
             self.canvas.delete(self.danmu_list[0].id)
             del self.danmu_list[0]
 
-        # print("处理了",self.canvas.find_all())
-
-        self.canvas.after(100,self.danmu_handler)
+        self.canvas.after(100, self.danmu_handler)
 
     def danmu_add(self):
         if not self.q.empty():
             temptext = self.q.get()
             tempx = self.ws
-            tempfontsize=randint(15,30)
-            tempy = randint(100,self.hs/2)
+            tempfontsize = randint(15, 30)
+            tempy = randint(100, self.hs / 2)
             tempid = self.canvas.create_text(tempx, tempy, text=temptext, font=("Fixdsys", tempfontsize, "bold"),
                                              fill=choice(self.colors))
             tempdanmu = Danmu(temptext, tempid, tempx, tempy)
             self.danmu_list.append(tempdanmu)
-            # print("添加："+tempdanmu.text)
-        # print("添加了")
-        self.canvas.after(1000,self.danmu_add)
+        self.canvas.after(1000, self.danmu_add)
 
     def __init__(self, q):
         tk.Toplevel.__init__(self)
@@ -62,7 +46,7 @@ class FloatingWindow(tk.Toplevel):
         self.hs = self.winfo_screenheight()
         self.canvas = tk.Canvas(self, width=self.ws, height=self.hs)
         self.canvas.create_rectangle(0, 0, self.ws, self.hs, fill="blue")
-        self.colors=["black","red","green","yellow","pink"]
+        self.colors = ["black", "red", "green", "yellow", "pink"]
 
         self.q = q
         self.danmu_list = []
@@ -95,41 +79,8 @@ def invoke_gui(q):
     app.mainloop()
 
 
-import socket
-import time
-import os
 from multiprocessing import Process, Queue
-import subprocess
-
-
-def invoke_sock(q):
-    # 发送admin请求
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('127.0.0.1', 5000))
-    s.send(b"GET /admin?username=admin&password=admin HTTP/1.1\r\n")
-    s.close()
-    time.sleep(3)
-    # 连接5001
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('127.0.0.1', 5001))
-    s.recv(1024)
-    # print(s.recv(1024).decode('utf-8'))
-
-    buffer = []
-    while True:
-        # 每次最多接收1k字节:
-        d = s.recv(4096)
-        if d:
-            print(d.decode('utf-8'))
-            q.put(d.decode('utf-8'))
-            buffer.append(d)
-        else:
-            break
-    data = b''.join(buffer)
-    print(data.decode('utf-8'))
-
-    s.close()
-
+from client.socket_connect import invoke_sock
 
 if __name__ == "__main__":
     q = Queue()
