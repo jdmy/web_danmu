@@ -8,7 +8,7 @@ import urllib.request
 
 def invoke_sock(q):
     time.sleep(1)
-    url = "http://127.0.0.1:5000/danmu_get"
+    url = "http://www.jdmy.me/danmu_get"
     while True:
         data = urllib.request.urlopen(url).read()
         if data != b'no':

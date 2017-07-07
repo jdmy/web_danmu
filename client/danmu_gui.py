@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import tkinter as tk
 from random import choice, randint
 
